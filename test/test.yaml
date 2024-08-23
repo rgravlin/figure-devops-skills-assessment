@@ -1,0 +1,113 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nginx-database-db01
+  labels:
+    app: nginx-database
+spec:
+  selector:
+    matchLabels:
+      app: nginx-database
+  template:
+    metadata:
+      labels:
+        app: nginx-database
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-database
+  labels:
+    app: nginx-database
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-database
+  template:
+    metadata:
+      labels:
+        app: nginx-database
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nginx-database
+  labels:
+    app: nginx-database
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-database
+  template:
+    metadata:
+      labels:
+        app: nginx-database
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+              name: web
+  serviceName: nginx-database
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-database
+  labels:
+    app: nginx-database
+spec:
+  ports:
+    - port: 80
+      name: web
+  clusterIP: None
+  selector:
+    app: nginx-database
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-database-alpha
+spec:
+  containers:
+    - name: nginx
+      image: nginx:latest
+      ports:
+        - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deploy
+  labels:
+    app: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
